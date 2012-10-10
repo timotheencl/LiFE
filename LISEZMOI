@@ -1,0 +1,21 @@
+##############################################
+######		COMPILER LiFE		######
+##############################################
+
+Pour compiler correctement le programme, il vous faut:
+
+ * Une distribution linux (Debian, Red hat ...)
+ * Un compilateur C ANSI
+ * La bibliothèque SDL		(Pour l'installer: sudo apt-get install libsdl1.2-dev)
+ * La bibliothèque SDL_Image	(Pour l'installer: sudo apt-get install libsdl-image1.2-dev)
+ * La bibliothèque SDL_ttf	(Pour l'installer: sudo apt-get install libsdl-ttf2.0-dev)
+ * La bibliothèque OpenGL
+ 
+ Instructions de compilations:
+ 
+ 1) Placez-vous dans le dossier racine du projet
+ 2) Compilez à l'aide de la commande 'make'
+ 3) Exécuter le programme avec la commande: ./LiFE
+ 
+ 
+ Pour plus d'informations sur l'utilisation du logiciel, reportez-vous au manuel d'utilisation.
