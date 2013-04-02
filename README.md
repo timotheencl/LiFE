@@ -12,5 +12,5 @@ Requirements:
  
 Compilation steps:
  
- 1) Compile with the command 'make'
- 2) Run with: ./LiFE
+ 1. Compile with the command 'make'
+ 2. Run with: ./LiFE
