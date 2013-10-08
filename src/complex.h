@@ -21,6 +21,10 @@
 #include <stdio.h>
 #include <math.h>
 
+#ifdef USE_SSE
+#include <emmintrin.h>
+#endif
+
 /* Macros */
 
 /**

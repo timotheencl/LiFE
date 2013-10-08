@@ -22,7 +22,7 @@
  * \param imaginary Partie Imaginaire
  * \return Le nombre complexe 
  */
-complex complexSet(double real, double imaginary)
+inline complex complexSet(double real, double imaginary)
 {
 	complex z;
 	
@@ -38,7 +38,7 @@ complex complexSet(double real, double imaginary)
  * \param z Nombre complexe
  * \return Un double représentant la partie réelle de z
  */
-double complexRe(complex z)
+inline double complexRe(complex z)
 {
 	return z.real;
 }
@@ -50,7 +50,7 @@ double complexRe(complex z)
  * \param z Nombre complexe
  * \return Un double représentant la partie imaginaire de z
  */
-double complexIm(complex z)
+inline double complexIm(complex z)
 {
 	return z.imag;
 }
@@ -61,7 +61,7 @@ double complexIm(complex z)
  * \param z Nombre complexe
  * \return Le nombre complexe conjugé 
  */
-complex complexConj(complex z)
+inline complex complexConj(complex z)
 {
 	z.imag = -z.imag;
 	return z;
@@ -74,9 +74,22 @@ complex complexConj(complex z)
  * \param z Nombre complexe
  * \return Un \e double représentant la valeur absolue
  */
-double complexAbs(complex z)
+inline double complexAbs(complex z)
 {
-	return sqrt(z.real*z.real + z.imag*z.imag);
+	#ifndef USE_SSE
+
+		return sqrt(z.real*z.real + z.imag*z.imag);
+	
+	#elif
+
+		double ret;
+		__m128d z 	= _mm_set_pd( z.real, z.imag );
+		__m128d tmp = _mm_mul_pd(z,z)
+		__m128d res = _mm_sqrt_pd(_mm_hadd_pd(tmp,tmp));
+		_mm_store_sd(&ret,res);
+		return ret;
+
+	#endif
 }
 
 /**
@@ -86,7 +99,7 @@ double complexAbs(complex z)
  * \param z Nombre complexe
  * \return Un \e double représentant l'argument
  */
-double complexArg(complex z)
+inline double complexArg(complex z)
 {
 	return atan(z.imag/z.real);
 }
@@ -99,14 +112,32 @@ double complexArg(complex z)
  * \param z2 Nombre complexe 2
  * \return Un complexe représentant la somme
  */
-complex complexAdd(complex z1, complex z2)
+inline complex complexAdd(complex z1, complex z2)
 {
-	complex z;
-	
-	z.real = z1.real + z2.real;
-	z.imag = z1.imag + z2.imag;
-	
-	return z;
+
+	#ifndef USE_SSE
+
+		complex z;
+		
+		z.real = z1.real + z2.real;
+		z.imag = z1.imag + z2.imag;
+		
+		return z;
+
+	#elif
+
+		double ret;
+
+		__m128d a = _mm_set_pd(z1.real, z1.imag);
+		__m128d b = _mm_set_pd(z2.real, z2.imag);
+
+		__m128d res = _mm_add_pd(a, b);
+
+		_mm_store_sd(&ret, res);
+
+		return ret;
+
+	#endif
 }
 
 /**
@@ -117,14 +148,31 @@ complex complexAdd(complex z1, complex z2)
  * \param z2 Nombre complexe 2
  * \return Un complexe représentant la différence
  */
-complex complexDif(complex z1, complex z2)
+inline complex complexDif(complex z1, complex z2)
 {
-	complex z;
-	
-	z.real = z1.real - z2.real;
-	z.imag = z1.imag - z2.imag;
-	
-	return z;
+	#ifndef USE_SSE
+
+		complex z;
+		
+		z.real = z1.real - z2.real;
+		z.imag = z1.imag - z2.imag;
+		
+		return z;
+
+	#elif
+
+		double ret;
+
+		__m128d a = _mm_set_pd(z1.real, z1.imag);
+		__m128d b = _mm_set_pd(z2.real, z2.imag);
+
+		__m128d res = _mm_sub_pd(a, b);
+
+		_mm_store_sd(&ret, res);
+
+		return ret;
+
+	#endif
 }
 
 /**
@@ -135,13 +183,37 @@ complex complexDif(complex z1, complex z2)
  * \param z2 Nombre complexe 2
  * \return Un complexe représentant le produit
  */
-complex complexMul(complex z1, complex z2)
+inline complex complexMul(complex z1, complex z2)
 {
 	complex z;
-	
-	z.real = z1.real*z2.real - z1.imag*z2.imag;
-	z.imag = z1.real*z2.imag + z1.imag*z2.real;
-	
+
+	#ifndef USE_SSE
+		
+		
+		z.real = z1.real*z2.real - z1.imag*z2.imag;
+		z.imag = z1.real*z2.imag + z1.imag*z2.real;
+		
+	#elif
+
+		__m128d a = _mm_set_pd(z1.real, z1.imag);
+		__m128d b = _mm_set_pd(z2.real, z2.imag);
+
+		__m128d mul_ab, real, imag, b_swp;
+
+		// Partie réelle
+		mul_ab = _mm_mul_pd(a, b);
+		real = _mm_hsub_pd(mul_ab, mul_ab);
+		
+		// Partie imaginaire
+		b_swp = _mm_shuffle_pd(b,b, _MM_SHUFFLE2(0, 1));
+		mul_ab = _mm_mul_pd(a, b_swp);
+		imag = _mm_hadd_pd(mul_ab, mul_ab);
+
+		_mm_store_sd(&z.real, real);
+		_mm_store_sd(&z.imag, imag);
+
+	#endif
+
 	return z;
 }
 
@@ -153,13 +225,46 @@ complex complexMul(complex z1, complex z2)
  * \param z2 Nombre complexe 2 (dénominateur)
  * \return Un complexe représentant le quotient complexe
  */
-complex complexDiv(complex z1, complex z2)
+inline complex complexDiv(complex z1, complex z2)
 {
 	complex z;
-	
-	z.real = (z1.real*z2.real + z1.imag*z2.imag) / (z2.real*z2.real + z2.imag*z2.imag);
-	z.imag = (z1.imag*z2.real - z2.imag*z1.real) / (z2.real*z2.real + z2.imag*z2.imag);
-	
+
+	#ifndef USE_SSE
+		
+		z.real = (z1.real*z2.real + z1.imag*z2.imag) / (z2.real*z2.real + z2.imag*z2.imag);
+		z.imag = (z1.imag*z2.real - z2.imag*z1.real) / (z2.real*z2.real + z2.imag*z2.imag);
+		
+	#elif
+
+		__m128d a = _mm_set_pd(z1.real, z1.imag);
+		__m128d b = _mm_set_pd(z2.real, z2.imag);
+
+		__m128d mul_ab,
+				hadd_mul_ab,
+				hadd_mul_bb,
+				real,
+				imag,
+				a_swp,
+				hsub_mul_ab;
+
+		// Partie réelle
+		mul_ab = _mm_mul_pd(a, b);
+		mul_bb = _mm_mul_pd(b, b);
+		hadd_mul_ab = _mm_hadd_pd(mul_ab, mul_ab);
+		hadd_mul_bb = _mm_hadd_pd(mul_bb, mul_bb);
+		real = _mm_div_pd(hadd_mul_ab, hadd_mul_bb);
+
+		// Partie imaginaire
+		a_swp = _mm_shuffle_pd(a,a, _MM_SHUFFLE2(0, 1));
+		mul_ab = _mm_mul_pd(a_swp, b);
+		hsub_mul_ab = _mm_hsub_pd(mul_ab, mul_ab);
+		imag = _mm_div_pd(hsub_mul_ab, hadd_mul_bb);
+
+		_mm_store_sd(&z.real, real);
+		_mm_store_sd(&z.imag, imag);
+
+	#endif
+
 	return z;
 }
 
@@ -171,7 +276,7 @@ complex complexDiv(complex z1, complex z2)
  * \param n Puissance
  * \return Un complexe représentant z^n
  */
-complex complexPow(complex z, int n)
+inline complex complexPow(complex z, int n)
 {
 	complex out = z;
 	int i;
