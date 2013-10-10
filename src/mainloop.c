@@ -430,6 +430,7 @@ void mainLoop(engineSettings* engine)
 					glBegin(GL_POINTS);
 					
 					/* On affiche le point selon le type de fractale complexe */
+					clock_t start = clock();
 					switch(fractalId)
 					{
 						case COMPLEX_MANDELBROT:
@@ -448,7 +449,9 @@ void mainLoop(engineSettings* engine)
 							computeNewton(zoom, newtonPower);
 							break;
 					}
-					
+					clock_t stop = clock();
+					printf("Fractal computed in: %.3f seconds\n", (double)(stop - start) / CLOCKS_PER_SEC);					
+
 					/* On termine les vertex points */
 					glEnd();
 					

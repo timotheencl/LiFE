@@ -4,7 +4,7 @@
  * \author Timothée NICOLAS
  * \author Nicolas SILVAIN
  * \author Nicolas NATIVO
- * \version 1.0
+ * \version 1.2
  * \date 28/12/2012
  * 
  * Permet la représentation et l'utilisation des nombres complexes.
@@ -80,11 +80,11 @@ inline double complexAbs(complex z)
 
 		return sqrt(z.real*z.real + z.imag*z.imag);
 	
-	#elif
+	#else
 
 		double ret;
-		__m128d z 	= _mm_set_pd( z.real, z.imag );
-		__m128d tmp = _mm_mul_pd(z,z)
+		__m128d a 	= _mm_set_pd( z.real, z.imag );
+		__m128d tmp = _mm_mul_pd(a,a);
 		__m128d res = _mm_sqrt_pd(_mm_hadd_pd(tmp,tmp));
 		_mm_store_sd(&ret,res);
 		return ret;
@@ -115,29 +115,29 @@ inline double complexArg(complex z)
 inline complex complexAdd(complex z1, complex z2)
 {
 
+	complex z ;
+
 	#ifndef USE_SSE
 
-		complex z;
-		
 		z.real = z1.real + z2.real;
 		z.imag = z1.imag + z2.imag;
-		
-		return z;
 
-	#elif
-
-		double ret;
+	#else
 
 		__m128d a = _mm_set_pd(z1.real, z1.imag);
 		__m128d b = _mm_set_pd(z2.real, z2.imag);
 
 		__m128d res = _mm_add_pd(a, b);
-
-		_mm_store_sd(&ret, res);
-
-		return ret;
+		
+		double cpx[2] __attribute__((aligned(16)));
+		_mm_store_pd(cpx, res);
+		
+		z.real = cpx[0];
+		z.imag = cpx[1];
 
 	#endif
+
+	return z;
 }
 
 /**
@@ -150,29 +150,30 @@ inline complex complexAdd(complex z1, complex z2)
  */
 inline complex complexDif(complex z1, complex z2)
 {
+
+	complex z ;
+
 	#ifndef USE_SSE
 
-		complex z;
-		
 		z.real = z1.real - z2.real;
 		z.imag = z1.imag - z2.imag;
-		
-		return z;
 
-	#elif
-
-		double ret;
+	#else
 
 		__m128d a = _mm_set_pd(z1.real, z1.imag);
 		__m128d b = _mm_set_pd(z2.real, z2.imag);
 
 		__m128d res = _mm_sub_pd(a, b);
-
-		_mm_store_sd(&ret, res);
-
-		return ret;
+		
+		double cpx[2] __attribute__((aligned(16)));
+		_mm_store_pd(cpx, res);
+		
+		z.real = cpx[0];
+		z.imag = cpx[1];
 
 	#endif
+
+	return z;
 }
 
 /**
@@ -193,7 +194,7 @@ inline complex complexMul(complex z1, complex z2)
 		z.real = z1.real*z2.real - z1.imag*z2.imag;
 		z.imag = z1.real*z2.imag + z1.imag*z2.real;
 		
-	#elif
+	#else
 
 		__m128d a = _mm_set_pd(z1.real, z1.imag);
 		__m128d b = _mm_set_pd(z2.real, z2.imag);
@@ -234,12 +235,13 @@ inline complex complexDiv(complex z1, complex z2)
 		z.real = (z1.real*z2.real + z1.imag*z2.imag) / (z2.real*z2.real + z2.imag*z2.imag);
 		z.imag = (z1.imag*z2.real - z2.imag*z1.real) / (z2.real*z2.real + z2.imag*z2.imag);
 		
-	#elif
+	#else
 
 		__m128d a = _mm_set_pd(z1.real, z1.imag);
 		__m128d b = _mm_set_pd(z2.real, z2.imag);
 
 		__m128d mul_ab,
+			mul_bb,
 				hadd_mul_ab,
 				hadd_mul_bb,
 				real,

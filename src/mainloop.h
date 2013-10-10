@@ -17,6 +17,7 @@
 #include "engine.h"
 #include "complexFractals.h"
 #include "recursiveFractals.h"
+#include <time.h>
 
 /**
  * \def ZOOM_PITCH

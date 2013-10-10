@@ -4,7 +4,7 @@
  * \author Timothée NICOLAS
  * \author Nicolas SILVAIN
  * \author Nicolas NATIVO
- * \version 1.1
+ * \version 1.2
  * \date 28/12/2012
  * 
  * Permet la représentation et l'utilisation des nombres complexes.
@@ -22,7 +22,7 @@
 #include <math.h>
 
 #ifdef USE_SSE
-#include <emmintrin.h>
+#include <pmmintrin.h>
 #endif
 
 /* Macros */

@@ -1,4 +1,14 @@
+cmake_minimum_required(VERSION 2.8)
+
 project(LiFE)
+
+option(USE_SSE "Use SIMD SSE3 instructions" OFF)
+
+if(USE_SSE)
+	add_definitions( -DUSE_SSE )
+	add_definitions( -msse3 )
+	message(status "** SSE3 optimized version **")
+endif(USE_SSE)
 
 file(
 	GLOB_RECURSE
