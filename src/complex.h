@@ -62,7 +62,7 @@ typedef union
 	{
 		double real;	/*!< Partie Réelle */
 		double imag;	/*!< Partie Imaginaire */
-	}
+	};
 
 	double 	raw[2];		/*!< Tableau de 2 double */
 
@@ -80,7 +80,7 @@ typedef union
  * \param imaginary Partie Imaginaire
  * \return Le nombre complexe 
  */
-inline complex complexSet(double real, double imaginary)
+static inline complex complexSet(double real, double imaginary)
 {
 	complex z;
 	
@@ -96,7 +96,7 @@ inline complex complexSet(double real, double imaginary)
  * \param z Nombre complexe
  * \return Un double représentant la partie réelle de z
  */
-inline double complexRe(complex z)
+static inline double complexRe(complex z)
 {
 	return z.real;
 }
@@ -108,7 +108,7 @@ inline double complexRe(complex z)
  * \param z Nombre complexe
  * \return Un double représentant la partie imaginaire de z
  */
-inline double complexIm(complex z)
+static inline double complexIm(complex z)
 {
 	return z.imag;
 }
@@ -120,7 +120,7 @@ inline double complexIm(complex z)
  * \param z Nombre complexe
  * \return Le nombre complexe conjugé 
  */
-inline complex complexConj(complex z)
+static inline complex complexConj(complex z)
 {
 	z.imag = -z.imag;
 	return z;
@@ -133,7 +133,7 @@ inline complex complexConj(complex z)
  * \param z Nombre complexe
  * \return Un \e double représentant la valeur absolue
  */
-inline double complexAbs(complex z)
+static inline double complexAbs(complex z)
 {
 	#ifndef USE_SSE
 
@@ -143,7 +143,7 @@ inline double complexAbs(complex z)
 
 		double ret;
 		__m128d tmp = _mm_mul_pd(z.mmx,z.mmx);
-		__m128d res = _mm_sqrt_sd(_mm_hadd_pd(tmp,tmp));
+		__m128d res = _mm_sqrt_pd(_mm_hadd_pd(tmp,tmp));
 		_mm_store_sd(&ret,res);
 		return ret;
 
@@ -157,7 +157,7 @@ inline double complexAbs(complex z)
  * \param z Nombre complexe
  * \return Un \e double représentant l'argument
  */
-inline double complexArg(complex z)
+static inline double complexArg(complex z)
 {
 	return atan2(z.imag,z.real);
 }
@@ -170,7 +170,7 @@ inline double complexArg(complex z)
  * \param z2 Nombre complexe 2
  * \return Un complexe représentant la somme
  */
-inline complex complexAdd(complex z1, complex z2)
+static inline complex complexAdd(complex z1, complex z2)
 {
 
 	complex z ;
@@ -203,7 +203,7 @@ inline complex complexAdd(complex z1, complex z2)
  * \param z2 Nombre complexe 2
  * \return Un complexe représentant la différence
  */
-inline complex complexDif(complex z1, complex z2)
+static inline complex complexDif(complex z1, complex z2)
 {
 
 	complex z ;
@@ -239,7 +239,7 @@ inline complex complexDif(complex z1, complex z2)
  * \param z2 Nombre complexe 2
  * \return Un complexe représentant le produit
  */
-inline complex complexMul(complex z1, complex z2)
+static inline complex complexMul(complex z1, complex z2)
 {
 	complex z;
 
@@ -278,7 +278,7 @@ inline complex complexMul(complex z1, complex z2)
  * \param z2 Nombre complexe 2 (dénominateur)
  * \return Un complexe représentant le quotient complexe
  */
-inline complex complexDiv(complex z1, complex z2)
+static inline complex complexDiv(complex z1, complex z2)
 {
 	complex z;
 
@@ -327,7 +327,7 @@ inline complex complexDiv(complex z1, complex z2)
  * \param n Puissance
  * \return Un complexe représentant z^n
  */
-inline complex complexPow(complex z, int n)
+static inline complex complexPow(complex z, int n)
 {
 	complex out = z;
 	int i;
@@ -345,7 +345,7 @@ inline complex complexPow(complex z, int n)
  * \param z Nombre complexe
  * \return Rien
  */
-inline void complexPrintf(complex z)
+static inline void complexPrintf(complex z)
 {
 	if (z.imag == 0.00)
 		printf("%.4g", z.real);
@@ -369,7 +369,7 @@ inline void complexPrintf(complex z)
  * \param *string Chaine de caractères représentant le nombre complexe.
  * \return Rien
  */
-inline void complexSprintf(char *string, complex z)
+static inline void complexSprintf(char *string, complex z)
 {
 	if (z.imag == 0.00)
 		sprintf(string, "%.4g", z.real);

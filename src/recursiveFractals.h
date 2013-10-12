@@ -10,6 +10,9 @@
  * 
  */
 
+#ifndef H_RECURSIVE_FRACTALS
+#define H_RECURSIVE_FRACTALS
+
 #include "engine.h"
 
 
@@ -55,3 +58,5 @@ void enleveTriangle(float x1,float y1,int iterationmax,float segment);
 void computeTriangleSierpinski(int LargeurFenetre, int HauteurFenetre,int iteration);
 void enleveCarre(float x1,float y1,int iterationmax,float segment);
 void computeCarreSierpinski(int LargeurFenetre, int HauteurFenetre,int iteration);
+
+#endif /* H_RECURSIVE_FRACTALS */

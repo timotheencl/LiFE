@@ -10,6 +10,8 @@ if(USE_SSE)
 	message(status "** SSE3 optimized version **")
 endif(USE_SSE)
 
+add_definitions(-O3)
+
 file(
 	GLOB_RECURSE
 	source_files
